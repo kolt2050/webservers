@@ -1,14 +1,9 @@
-FROM node:16-alpine
-
+FROM node:16-bullseye-slim AS build
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-
+COPY . /usr/src/app
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
 
-COPY . .
-
-EXPOSE 7777
-CMD [ "npm", "run", "start" ]
+FROM gcr.io/distroless/nodejs:16
+COPY --from=build /usr/src/app /usr/src/app
+WORKDIR /usr/src/app
+CMD ["index.js"]
